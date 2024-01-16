@@ -6,6 +6,34 @@ const Form = () => {
   const [task, setTask] = useState("");
   const [listTasks, setListTasks] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [isSearch , setIsSearch] = useState(false);
+  const [taskSearch, setTaskSearch] = useState("");
+  const { listSearch } = listTasks;
+
+  const handleSearchOnChange = (value) => {
+    setTaskSearch(value);
+  };
+
+  const handleSearchOnClick = () => {
+    if (taskSearch.trim() !== "") 
+    {
+      listSearch = listTasks.filter((task) => task.toLowerCase() == taskSearch.toLowerCase());        
+    }
+      // if (array.length > 0) {
+      //   setTaskSearchResult(<p>{taskSearch} </p>);
+      // } else {
+      //   setTaskSearchResult(<p>Not Found: {taskSearch}</p>);
+      // }
+
+      // if (taskHistory.length > 0) {
+      //   setTaskHistory((prevTaskHistory) => [...prevTaskHistory, taskSearch]);
+      // } else {
+      //   setTaskHistory([taskSearch]);
+      // }
+    else {
+      alert("Please, I need you write something...thanks.");
+    }
+  };
 
   const handleOnChange = () => {
     setChecked(!checked);
@@ -46,19 +74,21 @@ const Form = () => {
         </div>
       </div>
       <List
-        listTasks={listTasks}
+        list={isSearch ? listSearch: listTasks}
         setListTasks={setListTasks}
         handleOnChange={handleOnChange}
         checked={checked}
-      />
+        handleSearchOnChange={handleSearchOnChange}
+        handleSearchOnClick={handleSearchOnClick}
+      />   
     </>
   );
 };
 
-const List = ({ listTasks, setListTasks, handleOnChange, checked }) => {
+const List = ({ list, setListTasks, handleOnChange, checked, handleSearchOnClick, handleSearchOnChange }) => {
   const handleDeleteClick = (index, checked) => {
     if (checked === true) {
-      const updatelistTasks = [...listTasks];
+      const updatelistTasks = [...list];
       updatelistTasks.splice(index, 1);
       setListTasks(updatelistTasks);
     } else {
@@ -70,10 +100,11 @@ const List = ({ listTasks, setListTasks, handleOnChange, checked }) => {
 
   return (
     <>
-      {listTasks.length > 0 && <Search listTasks={listTasks} />}      
-      {listTasks.length > 0 && <h2>List of Tasks</h2>}
+      {list.length > 0 && <Search handleSearchOnClick={handleSearchOnClick} handleSearchOnChange={handleSearchOnChange} />}      
+      {list.length > 0 && <h2>List of Tasks</h2>}
       <ul className="list-group">
-        {listTasks.map(function (element, index) {
+        {
+           list.map(function (element, index) {
           return (
             <li className="list-group-item" key={index}>
               <input
@@ -94,45 +125,13 @@ const List = ({ listTasks, setListTasks, handleOnChange, checked }) => {
             </li>
           );
         }, this)}
+       
       </ul>
     </>
   );
 };
 
-const Search = ({ listTasks }) => {
-  const [taskSearch, setTaskSearch] = useState("");
-  const [taskSearchResult, setTaskSearchResult] = useState("");
-  const [taskHistory, setTaskHistory] = useState([]);
-
-  const handleOnChange = (value) => {
-    setTaskSearch(value);
-    setTaskSearchResult("");
-  };
-
-  let array = [];
-  const handleSearchClick = () => {
-    if (taskSearch.trim() !== "") {
-      setTaskSearchResult(
-        (array = listTasks.filter(
-          (task) => task.toLowerCase() == taskSearch.toLowerCase()
-        ))
-      );
-      if (array.length > 0) {
-        setTaskSearchResult(<p>The result of the search is: {taskSearch}</p>);
-      } else {
-        setTaskSearchResult(<p>Not Found: {taskSearch}</p>);
-      }
-
-      if (taskHistory.length > 0) {
-        setTaskHistory((prevTaskHistory) => [...prevTaskHistory, taskSearch]);
-      } else {
-        setTaskHistory([taskSearch]);
-      }
-    } else {
-      alert("Please, I need you write something...thanks.");
-    }
-  };
-
+const Search = ({handleSearchOnClick, handleSearchOnChange }) => {
   return (
     <>
       <div className="input-group mb-3">
@@ -140,21 +139,20 @@ const Search = ({ listTasks }) => {
           className="form-control"
           type="taskSearch"
           placeholder="Add an element..."
-          onChange={(e) => handleOnChange(e.target.value)}
+          onChange={(e) => handleSearchOnChange(e.target.value)}
           value={taskSearch}
         />
         <div className="input-group-append">
           <button
             className="btn btn-outline-secondary"
             type="submit"
-            onClick={handleSearchClick}
+            onClick={handleSearchOnClick}
           >
             Search
           </button>
           <br />
         </div>
       </div>
-      <div className="list-item">{taskSearchResult}</div>
     </>
   );
 };
